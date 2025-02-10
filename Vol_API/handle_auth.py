@@ -1,3 +1,4 @@
+import logging
 import requests
 
 from dotenv import load_dotenv, dotenv_values, set_key
@@ -41,8 +42,12 @@ def check_authentication(url: str) -> bool:
     print(response.text)
     return response.status_code == 200
 
-def authenticate(url: str):
+def authenticate(url: str):# Configure logging
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logger = logging.getLogger()
+    logger.info("Starting the AUTHENTICATION process...")
     auth_is_valid = check_authentication(url)
     if not auth_is_valid:
         auth_is_valid = update_authentication(url)
+    logger.info("AUTHENTICATION loaded successfully.")
     return auth_is_valid
