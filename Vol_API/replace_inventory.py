@@ -9,6 +9,7 @@ def replace_inventory(url, payload: dict) -> None:
     URL = f"{url}v1beta/paragon_sports/inventory?override=true"
     config = dotenv_values(".env")
     BEARER = config.get("VOL_BEARER")
+    print("BEARER TEST", BEARER)
 
     headers = {
         "accept": "application/json",
@@ -17,7 +18,7 @@ def replace_inventory(url, payload: dict) -> None:
     }
 
     response = requests.put(URL, json=payload, headers=headers)
-    print(response)
+    print("Replace Inv:", response)
     print(response.text)
     if response.status_code != 204:
         logger.error(f"Replace Inventory API: [{response.status_code}]")

@@ -19,7 +19,7 @@ def update_authentication(url: str) -> bool:
         "content-type": "application/json"
     }
     response = requests.post(URL, json=payload, headers=headers)
-    print(response)
+    print("Auth Update:", response)
     print(response.text)
     if response.status_code == 200:
         data = response.json()
@@ -37,8 +37,9 @@ def check_authentication(url: str) -> bool:
         "accept": "application/json",
         "authorization": f"Bearer {BEARER}"
     }
+    print("BEARER TEST", BEARER)
     response = requests.get(URL, headers=headers)
-    print(response)
+    print("Auth Check:", response)
     print(response.text)
     return response.status_code == 200
 
