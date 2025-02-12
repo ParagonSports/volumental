@@ -1,3 +1,4 @@
+import os
 import logging
 import requests
 
@@ -31,8 +32,7 @@ def update_authentication(url: str) -> bool:
 
 def check_authentication(url: str) -> bool:
     URL = url
-    config = dotenv_values(".env")
-    BEARER = config.get("VOL_BEARER")
+    BEARER = os.getenv("VOL_BEARER")
     headers = {
         "accept": "application/json",
         "authorization": f"Bearer {BEARER}"
@@ -43,7 +43,7 @@ def check_authentication(url: str) -> bool:
     print(response.text)
     return response.status_code == 200
 
-def authenticate(url: str):# Configure logging
+def authenticate(url: str):
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     logger = logging.getLogger()
     logger.info("Starting the AUTHENTICATION process...")

@@ -1,3 +1,4 @@
+import os
 import logging
 
 from dotenv import dotenv_values
@@ -7,8 +8,7 @@ def replace_inventory(url, payload: dict) -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     logger = logging.getLogger()
     URL = f"{url}v1beta/paragon_sports/inventory?override=true"
-    config = dotenv_values(".env")
-    BEARER = config.get("VOL_BEARER")
+    BEARER = os.getenv("VOL_BEARER")
     print("BEARER TEST", BEARER)
 
     headers = {
