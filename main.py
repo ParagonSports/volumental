@@ -1,6 +1,7 @@
 import os
 import io
 import logging
+import sys
 from ftplib import FTP
 
 from Utilities.create_df import create_df
@@ -9,8 +10,14 @@ from Utilities.build_inv_payload import build_inv_payload
 from Vol_API.handle_auth import authenticate
 from Vol_API.replace_inventory import replace_inventory
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 logger = logging.getLogger()
+logger.info("This message should appear in IBM Cloud Code Engine logs.")
+print("Print statement test - should also appear in logs")
 
 FTP_HOST = "paragon.hostedftp.com"
 FTP_USERNAME = os.getenv("FTP_USER")
