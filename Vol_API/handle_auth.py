@@ -1,16 +1,47 @@
 import os
-import logging
+
 import requests
 
-from dotenv import load_dotenv, dotenv_values, set_key
+import ibm_boto3 
+from ibm_botocore.client import Config
 
-load_dotenv(".env")
+COS_API_KEY = os.getenv("COS_API_KEY")
+COS_INSTANCE_CRN = os.getenv("COS_INSTANCE_CRN")
+COS_ENDPOINT = os.getenv("COS_ENDPOINT")
+BUCKET_NAME = os.getenv("IBM_BUCKET")
+BEARER_FILE = "volumental_bearer.txt"
 
-def update_authentication(url: str) -> bool:
+cos = ibm_boto3.client(
+    service_name="s3",
+    ibm_api_key_id=COS_API_KEY,
+    ibm_service_instance_id=COS_INSTANCE_CRN,
+    config=Config(signature_version='oauth'),
+    endpoint_url=COS_ENDPOINT
+)
+
+def get_stored_bearer() -> str:
+    try:
+        response = cos.get_object(Bucket=BUCKET_NAME, Key=BEARER_FILE)
+        print("IBM Cloud Object Storage - Accessing Stored Bearer")
+        return response["Body"].read().decode("utf-8")
+    except cos.exceptions.NoSuchKey:
+        print("IBM Cloud Object Storage - No Bearer Found")
+        return None
+
+def bearer_is_valid(url: str, bearer: str) -> bool:
+    URL = url
+    headers = {
+        "accept": "application/json",
+        "authorization": f"Bearer {bearer}"
+    }
+    response = requests.get(URL, headers=headers)
+    print("Volumental - Stored Bearer is Valid Check:", response.status_code)
+    return response.status_code == 200
+
+def get_new_bearer(url: str) -> bool:
     URL = f"{url}v1/auth"
-    config = dotenv_values(".env")
-    CLIENT_ID = config.get("VOL_CLIENT_ID")
-    CLIENT_SECRET = config.get("VOL_CLIENT_SECRET")
+    CLIENT_ID = os.getenv("VOL_CLIENT_ID")
+    CLIENT_SECRET = os.getenv("VOL_CLIENT_SECRET")
     payload = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET
@@ -20,35 +51,21 @@ def update_authentication(url: str) -> bool:
         "content-type": "application/json"
     }
     response = requests.post(URL, json=payload, headers=headers)
-    print("Auth Update:", response)
-    print(response.text)
+    print("Volumental - Get New Bearer:", response.status_code)
     if response.status_code == 200:
         data = response.json()
         new_bearer = data["access_token"]
-        set_key(".env", "VOL_BEARER", new_bearer)
-        load_dotenv(override=True)
-        return True
+        return new_bearer
     raise Exception("AUTHENTICATION ERROR")
 
-def check_authentication(url: str) -> bool:
-    URL = url
-    BEARER = os.getenv("VOL_BEARER")
-    headers = {
-        "accept": "application/json",
-        "authorization": f"Bearer {BEARER}"
-    }
-    print("BEARER TEST", BEARER)
-    response = requests.get(URL, headers=headers)
-    print("Auth Check:", response)
-    print(response.text)
-    return response.status_code == 200
+def save_new_bearer(bearer):
+    print("IBM Cloud Object Storage - Saving New Bearer")
+    cos.put_object(Bucket=BUCKET_NAME, Key=BEARER_FILE, Body=bearer)
 
-def authenticate(url: str):
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-    logger = logging.getLogger()
-    logger.info("Starting the AUTHENTICATION process...")
-    auth_is_valid = check_authentication(url)
-    if not auth_is_valid:
-        auth_is_valid = update_authentication(url)
-    logger.info("AUTHENTICATION loaded successfully.")
-    return auth_is_valid
+def get_valid_bearer(url: str):
+    stored_bearer = get_stored_bearer()
+    if stored_bearer and bearer_is_valid(url, stored_bearer):
+        return stored_bearer
+    new_bearer = get_new_bearer(url)
+    save_new_bearer(new_bearer)
+    return new_bearer
