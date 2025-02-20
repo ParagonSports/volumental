@@ -31,6 +31,6 @@ def create_df(file: io.BytesIO, cols: dict) -> pd.DataFrame:
     all_cols = str_cols + float_cols + int_cols
     col_dtypes = set_data_types(str_cols, float_cols, int_cols)
     na_vals = set_na_vals(str_cols, float_cols, int_cols)
-    df = pd.read_excel(file, usecols=all_cols, dtype=col_dtypes)
+    df = pd.read_csv(file, usecols=all_cols, dtype=col_dtypes)
     df.fillna(value=na_vals, inplace=True)
     return df

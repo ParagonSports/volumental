@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 pandas = "*"
 requests = "*"
-openpyxl = "*"
 python-dotenv = "*"
 ibm-cos-sdk = "*"
 
