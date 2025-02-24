@@ -14,9 +14,9 @@ FTP_PASSWORD = os.getenv("FTP_PASS")
 PRODUCT_DATA_FILE_PATH = "/Volumental/volumental.csv"
 VOL_URL = "https://api.volumental.dev/"
 if not FTP_USERNAME or not FTP_PASSWORD:
-    print("FTP Credentials not found!")
+    print("FTP Credentials not found!", flush=True)
 else:
-    print("FTP Credentials loaded successfully.") 
+    print("FTP Credentials loaded successfully.", flush=True) 
 
 ftp = FTP(FTP_HOST)
 ftp.login(FTP_USERNAME, FTP_PASSWORD)
@@ -28,8 +28,8 @@ ftp.quit()
 
 product_data_df = create_df(data, columns_map["product_data"])
 inventory_payload = build_inv_payload(product_data_df)
-print(f"Inventory Payload Built - Size: {len(inventory_payload)}")
+print(f"Inventory Payload Built - Size: {len(inventory_payload)}", flush=True)
 
 vol_bearer = get_valid_bearer(VOL_URL)
 replace_inventory(VOL_URL, vol_bearer, inventory_payload)
-print("~ Volumental Inventory Update Complete ~")
+print("~ Volumental Inventory Update Complete ~", flush=True)

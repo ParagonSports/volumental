@@ -8,7 +8,8 @@ def replace_inventory(url: str, bearer: str, payload: dict) -> None:
         "authorization": f"Bearer {bearer}"
     }
     response = requests.put(URL, json=payload, headers=headers)
-    print("Volumental - Replace Inventory:", response.status_code)
-    print(response.text)
-    if response.status_code != 204:
+    status = response.status_code
+    print(f"Volumental - Replace Inventory: {status}", flush=True)
+    if status != 204:
+        print(response.text, flush=True)
         raise Exception("VOLUMENTAL INVENTORY UPLOAD FAILED")

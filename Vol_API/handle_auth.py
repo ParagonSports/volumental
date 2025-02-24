@@ -22,10 +22,9 @@ cos = ibm_boto3.client(
 def get_stored_bearer() -> str:
     try:
         response = cos.get_object(Bucket=BUCKET_NAME, Key=BEARER_FILE)
-        print("IBM Cloud Object Storage - Accessing Stored Bearer")
         return response["Body"].read().decode("utf-8")
     except cos.exceptions.NoSuchKey:
-        print("IBM Cloud Object Storage - No Bearer Found")
+        print("IBM Cloud Object Storage - No Bearer Found", flush=True)
         return None
 
 def bearer_is_valid(url: str, bearer: str) -> bool:
@@ -35,7 +34,7 @@ def bearer_is_valid(url: str, bearer: str) -> bool:
         "authorization": f"Bearer {bearer}"
     }
     response = requests.get(URL, headers=headers)
-    print("Volumental - Stored Bearer is Valid Check:", response.status_code)
+    print("Volumental - Stored Bearer is Valid Check:", response.status_code, flush=True)
     return response.status_code == 200
 
 def get_new_bearer(url: str) -> bool:
@@ -51,15 +50,16 @@ def get_new_bearer(url: str) -> bool:
         "content-type": "application/json"
     }
     response = requests.post(URL, json=payload, headers=headers)
-    print("Volumental - Get New Bearer:", response.status_code)
+    print("Volumental - Get New Bearer:", response.status_code, flush=True)
     if response.status_code == 200:
         data = response.json()
         new_bearer = data["access_token"]
         return new_bearer
+    print(response.text, flush=True)
     raise Exception("AUTHENTICATION ERROR")
 
 def save_new_bearer(bearer):
-    print("IBM Cloud Object Storage - Saving New Bearer")
+    print("IBM Cloud Object Storage - Saving New Bearer", flush=True)
     cos.put_object(Bucket=BUCKET_NAME, Key=BEARER_FILE, Body=bearer)
 
 def get_valid_bearer(url: str):
