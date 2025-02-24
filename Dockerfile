@@ -16,5 +16,9 @@ RUN pipenv install --deploy --ignore-pipfile
 # Copy the rest of the application files
 COPY . /app
 
+# Create a non-root user and switch to it
+RUN useradd --create-home appuser
+USER appuser
+
 # Set the command to run your script
 CMD ["pipenv", "run", "python", "main.py"]
