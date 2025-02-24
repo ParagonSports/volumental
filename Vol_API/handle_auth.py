@@ -34,8 +34,9 @@ def bearer_is_valid(url: str, bearer: str) -> bool:
         "authorization": f"Bearer {bearer}"
     }
     response = requests.get(URL, headers=headers)
-    print("Volumental - Stored Bearer is Valid Check:", response.status_code, flush=True)
-    return response.status_code == 200
+    status = response.status_code
+    print(f"Volumental - Stored Bearer is Valid Check: {status}", flush=True)
+    return status == 200
 
 def get_new_bearer(url: str) -> bool:
     URL = f"{url}v1/auth"
@@ -50,8 +51,9 @@ def get_new_bearer(url: str) -> bool:
         "content-type": "application/json"
     }
     response = requests.post(URL, json=payload, headers=headers)
-    print("Volumental - Get New Bearer:", response.status_code, flush=True)
-    if response.status_code == 200:
+    status = response.status_code
+    print(f"Volumental - Get New Bearer: {status}", flush=True)
+    if status == 200:
         data = response.json()
         new_bearer = data["access_token"]
         return new_bearer

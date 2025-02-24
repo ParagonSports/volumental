@@ -12,7 +12,7 @@ FTP_HOST = "paragon.hostedftp.com"
 FTP_USERNAME = os.getenv("FTP_USER")
 FTP_PASSWORD = os.getenv("FTP_PASS")
 PRODUCT_DATA_FILE_PATH = "/Volumental/volumental.csv"
-VOL_URL = "https://api.volumental.dev/"
+VOL_URL = "https://api.volumental.com/"
 if not FTP_USERNAME or not FTP_PASSWORD:
     print("FTP Credentials not found!", flush=True)
 else:
